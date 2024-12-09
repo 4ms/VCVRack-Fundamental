@@ -46,7 +46,7 @@ struct Scope : Module {
 	int bufferIndex = 0;
 	int frameIndex = 0;
 
-	dsp::SchmittTrigger triggers[16];
+	dsp::SchmittTrigger triggers[PORT_MAX_CHANNELS];
 
 	Scope() {
 		config(NUM_PARAMS, NUM_INPUTS, NUM_OUTPUTS, NUM_LIGHTS);
@@ -75,7 +75,7 @@ struct Scope : Module {
 	void onReset() override {
 		for (int i = 0; i < BUFFER_SIZE; i++) {
 			for (int w = 0; w < 2; w++) {
-				for (int c = 0; c < 16; c++) {
+				for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
 					pointBuffer[i][w][c] = Point();
 				}
 			}
@@ -113,7 +113,7 @@ struct Scope : Module {
 			}
 
 			if (triggered) {
-				for (int c = 0; c < 16; c++) {
+				for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
 					triggers[c].reset();
 				}
 				bufferIndex = 0;
@@ -164,13 +164,13 @@ struct Scope : Module {
 				frameIndex = 0;
 				// Push current point
 				for (int w = 0; w < 2; w++) {
-					for (int c = 0; c < 16; c++) {
+					for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
 						pointBuffer[bufferIndex][w][c] = currentPoint[w][c];
 					}
 				}
 				// Reset current point
 				for (int w = 0; w < 2; w++) {
-					for (int c = 0; c < 16; c++) {
+					for (int c = 0; c < PORT_MAX_CHANNELS; c++) {
 						currentPoint[w][c] = Point();
 					}
 				}
