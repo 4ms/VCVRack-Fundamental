@@ -2,7 +2,11 @@
 #include <rack.hpp>
 #include <osdialog.h>
 #include "dr_wav.h"
+#if defined(METAMODULE)
+#include "async_filebrowser.hh"
+#else
 #include <thread>
+#endif
 
 
 static const char WAVETABLE_FILTERS[] = "WAV (.wav):wav,WAV;Raw:f32,i8,i16,i24,i32,*";
@@ -50,7 +54,11 @@ struct Wavetable {
 		loading = true;
 		DEFER({loading = false;});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
+#if defined(METAMODULE)
+		// delay_ms(1);
+#else
 		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
+#endif
 		samples.resize(waveLen * 4);
 
 		// Sine
@@ -165,7 +173,11 @@ struct Wavetable {
 		loading = true;
 		DEFER({loading = false;});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
+#if defined(METAMODULE)
+		// delay_ms(1);
+#else
 		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
+#endif
 
 		std::string ext = string::lowercase(system::getExtension(path));
 		if (ext == ".wav") {
@@ -229,10 +241,15 @@ struct Wavetable {
 	}
 
 	void loadDialog() {
+
 		osdialog_filters* filters = osdialog_filters_parse(WAVETABLE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_OPEN, wavetableDir.empty() ? NULL : wavetableDir.c_str(), NULL, filters, [this](char *pathC) {
+#else
 		char* pathC = osdialog_file(OSDIALOG_OPEN, wavetableDir.empty() ? NULL : wavetableDir.c_str(), NULL, filters);
+#endif
 		if (!pathC) {
 			// Fail silently
 			return;
@@ -243,6 +260,9 @@ struct Wavetable {
 
 		load(path);
 		filename = system::getFilename(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void save(std::string path) const {
@@ -272,7 +292,11 @@ struct Wavetable {
 		osdialog_filters* filters = osdialog_filters_parse(WAVETABLE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 
+#if defined(METAMODULE)
+		async_osdialog_file(OSDIALOG_SAVE, wavetableDir.empty() ? NULL : wavetableDir.c_str(), filename.c_str(), filters, [this](char *pathC) {
+#else
 		char* pathC = osdialog_file(OSDIALOG_SAVE, wavetableDir.empty() ? NULL : wavetableDir.c_str(), filename.c_str(), filters);
+#endif
 		if (!pathC) {
 			// Cancel silently
 			return;
@@ -287,6 +311,9 @@ struct Wavetable {
 		wavetableDir = system::getDirectory(path);
 
 		save(path);
+#if defined(METAMODULE)
+		});
+#endif
 	}
 
 	void appendContextMenu(Menu* menu) {
