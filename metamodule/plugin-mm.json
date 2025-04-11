@@ -40,7 +40,8 @@
 	},
 	{
 		"slug": "MidSide",
-		"name": "Mid/Side"
+		"name": "Mid/Side",
+		"displayName": "Mid/Side"
 	},
 	{
 		"slug": "Mixer",
@@ -92,15 +93,18 @@
 	},
 	{
 		"slug": "SHASR",
-		"name": "S&H Analog Shift Register"
+		"name": "S&H Analog Shift Register",
+		"displayName": "S&H Analog Shift Reg"
 	},
 	{
 		"slug": "SequentialSwitch1",
-		"name": "Sequential Switch 1 to 4"
+		"name": "Sequential Switch 1 to 4",
+		"displayName": "Seq. Switch 1 to 4"
 	},
 	{
 		"slug": "SequentialSwitch2",
-		"name": "Sequential Switch 4 to 1"
+		"name": "Sequential Switch 4 to 1",
+		"displayName": "Seq. Switch 4 to 1"
 	},
 	{
 		"slug": "Unity",
@@ -108,11 +112,13 @@
 	},
 	{
 		"slug": "VCA",
-		"name": "VCA (2 chan)"
+		"name": "VCA (2 chan)",
+		"displayName": "VCA (2 chan)"
 	},
 	{
 		"slug": "VCA-1",
 		"name": "VCA"
+		"displayName": "VCA"
 	},
 	{
 		"slug": "VCF",
@@ -120,7 +126,8 @@
 	},
 	{
 		"slug": "VCMixer",
-		"name": "VCA Mixer"
+		"name": "VCA Mixer",
+		"displayName": "VCA Mixer"
 	},
 	{
 		"slug": "VCO",
@@ -129,6 +136,20 @@
 	{
 		"slug": "Quantizer",
 		"name": "Quantizer"
+	},
+    {
+      "slug": "VCO2",
+      "name": "Wavetable VCO",
+      "displayName": "Wavetable VCO",
+	},
+    {
+      "slug": "LFO2",
+      "name": "Wavetable LFO",
+      "displayName": "Wavetable LFO",
+	},
+    {
+      "slug": "Delay",
+      "name": "Delay"
 	}
 	]
 }
