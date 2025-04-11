@@ -117,7 +117,7 @@
 	},
 	{
 		"slug": "VCA-1",
-		"name": "VCA"
+		"name": "VCA",
 		"displayName": "VCA"
 	},
 	{
@@ -137,19 +137,19 @@
 		"slug": "Quantizer",
 		"name": "Quantizer"
 	},
-    {
-      "slug": "VCO2",
-      "name": "Wavetable VCO",
-      "displayName": "Wavetable VCO",
+	{
+		"slug": "VCO2",
+		"name": "Wavetable VCO",
+		"displayName": "Wavetable VCO"
 	},
-    {
-      "slug": "LFO2",
-      "name": "Wavetable LFO",
-      "displayName": "Wavetable LFO",
+	{
+		"slug": "LFO2",
+		"name": "Wavetable LFO",
+		"displayName": "Wavetable LFO"
 	},
-    {
-      "slug": "Delay",
-      "name": "Delay"
+	{
+		"slug": "Delay",
+		"name": "Delay"
 	}
 	]
 }
