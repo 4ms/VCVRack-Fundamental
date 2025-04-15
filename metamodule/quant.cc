@@ -233,15 +233,4 @@ std::string Quant::save_state() {
 	return state_data;
 }
 
-void Quant::register_module() {
-	using Info = QuantInfo;
-
-	MetaModule::register_module(
-		"Fundamental",
-		Info::slug,
-		[]() { return std::make_unique<Quant>(); },
-		MetaModule::ModuleInfoView::makeView<Info>(),
-		Info::png_filename);
-}
-
 } // namespace MetaModule::RackClone

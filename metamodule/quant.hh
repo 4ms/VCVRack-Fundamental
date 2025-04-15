@@ -19,8 +19,6 @@ public:
 	void load_state(std::string_view state_data) override;
 	std::string save_state() override;
 
-	static void register_module();
-
 private:
 	void onReset();
 	void onRandomize();

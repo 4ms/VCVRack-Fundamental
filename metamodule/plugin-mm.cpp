@@ -1,5 +1,7 @@
+#include "CoreModules/register_module.hh"
 #include "plugin.hpp"
 #include "quant.hh"
+#include "quant_info.hh"
 
 #if defined(METAMODULE_BUILTIN)
 #define MM_EXTERN extern
@@ -49,7 +51,9 @@ void MM_INIT(Plugin *p) {
 	p->addModel(modelPush);
 	p->addModel(modelSHASR);
 
-	MetaModule::RackClone::Quant::register_module();
+	using namespace MetaModule;
+
+	register_module<RackClone::Quant, RackClone::QuantInfo>("Fundamental");
 }
 
 MenuItem *createRangeItem(std::string label, float *gain, float *offset) {
