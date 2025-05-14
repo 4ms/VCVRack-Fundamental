@@ -150,6 +150,10 @@
 	{
 		"slug": "Delay",
 		"name": "Delay"
+	},
+	{
+		"slug": "Scope",
+		"name": "Scope"
 	}
 	]
 }
