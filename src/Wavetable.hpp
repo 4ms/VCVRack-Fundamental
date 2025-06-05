@@ -4,6 +4,7 @@
 #include "dr_wav.h"
 #if defined(METAMODULE)
 #include "async_filebrowser.hh"
+#include <chrono>
 #else
 #include <thread>
 #endif
@@ -55,7 +56,9 @@ struct Wavetable {
 		DEFER({loading.store(false, std::memory_order_release);});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
 #if defined(METAMODULE)
-		// delay_ms(1);
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+		while (std::chrono::steady_clock::now().time_since_epoch().count() - now < 100'000)
+			;
 #else
 		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
 #endif
@@ -174,7 +177,9 @@ struct Wavetable {
 		DEFER({loading.store(false, std::memory_order_release);});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
 #if defined(METAMODULE)
-		// delay_ms(1);
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+		while (std::chrono::steady_clock::now().time_since_epoch().count() - now < 100'000)
+			;
 #else
 		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
 #endif
