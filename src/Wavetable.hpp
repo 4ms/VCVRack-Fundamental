@@ -34,7 +34,7 @@ struct Wavetable {
 	*/
 	std::vector<float> interpolatedSamples;
 
-	bool loading = false;
+	std::atomic<bool> loading = false;
 
 	Wavetable() {}
 
@@ -51,8 +51,8 @@ struct Wavetable {
 	void reset() {
 		filename = "Basic.wav";
 		waveLen = 1024;
-		loading = true;
-		DEFER({loading = false;});
+		loading.store(true, std::memory_order_acquire);
+		DEFER({loading.store(false, std::memory_order_release);});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
 #if defined(METAMODULE)
 		// delay_ms(1);
@@ -170,8 +170,8 @@ struct Wavetable {
 	}
 
 	void load(std::string path) {
-		loading = true;
-		DEFER({loading = false;});
+		loading.store(true, std::memory_order_acquire);
+		DEFER({loading.store(false, std::memory_order_release);});
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
 #if defined(METAMODULE)
 		// delay_ms(1);
