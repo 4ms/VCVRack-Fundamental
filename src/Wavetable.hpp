@@ -33,6 +33,10 @@ struct Wavetable {
 	/** Waves bandlimited at each octave
 	(octave, waveCount, waveLen * quality)
 	*/
+#ifdef METAMODULE
+	size_t requested_quality = 0;
+	static constexpr size_t max_samples = 20'000'000; //80MB max
+#endif
 	std::vector<float> interpolatedSamples;
 
 	std::atomic<bool> loading = false;
@@ -88,9 +92,13 @@ struct Wavetable {
 	}
 
 	void setQuality(size_t quality) {
+#ifdef METAMODULE
+		requested_quality = quality;
+#else
 		if (quality == this->quality)
 			return;
 		this->quality = quality;
+#endif
 		interpolate();
 	}
 
@@ -109,8 +117,10 @@ struct Wavetable {
 	}
 
 	void interpolate() {
+#if !defined(METAMODULE)
 		if (quality == 0)
 			return;
+#endif
 		if (waveLen < 2)
 			return;
 
@@ -120,6 +130,14 @@ struct Wavetable {
 
 		octaves = math::log2(waveLen) - 1;
 		interpolatedSamples.clear();
+
+#ifdef METAMODULE
+		size_t max_quality = max_samples / (octaves * samples.size());
+		quality = std::min(requested_quality, max_quality);
+		if (quality == 0)
+			return;
+#endif
+
 		interpolatedSamples.resize(octaves * samples.size() * quality);
 
 		float* in = new float[waveLen];
