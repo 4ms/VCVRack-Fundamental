@@ -1,5 +1,7 @@
 #include "plugin.hpp"
 #include "Wavetable.hpp"
+#include "filesystem/helpers.hh"
+#include "patch/patch_file.hh"
 
 
 using simd::float_4;
@@ -99,16 +101,26 @@ struct WTLFO : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+#ifdef METAMODULE
+		std::string path;
+		if (wavetable.wt_path.empty())
+			path = MetaModule::Filesystem::translate_path_to_local(wavetable.filename, MetaModule::Patch::get_dir());
+		else
+			path = wavetable.wt_path;
+#else
 		std::string path = system::join(getPatchStorageDirectory(), "wavetable.wav");
+#endif
 		// Silently fails
 		wavetable.load(path);
 	}
 
 	void onSave(const SaveEvent& e) override {
+#ifndef METAMODULE
 		if (!wavetable.samples.empty()) {
 			std::string path = system::join(createPatchStorageDirectory(), "wavetable.wav");
 			wavetable.save(path);
 		}
+#endif
 	}
 
 	void process(const ProcessArgs& args) override {

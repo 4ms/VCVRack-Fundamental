@@ -3,7 +3,8 @@
 #include <osdialog.h>
 #include "dr_wav.h"
 #if defined(METAMODULE)
-#include "async_filebrowser.hh"
+#include "filesystem/async_filebrowser.hh"
+#include "patch/patch_file.hh"
 #include <chrono>
 #else
 #include <thread>
@@ -24,6 +25,11 @@ struct Wavetable {
 	size_t waveLen = 0;
 	/** Name of loaded wavetable. */
 	std::string filename;
+
+#if defined(METAMODULE)
+	// Path to wavetable, used by MM since it doesn't save a copy in patch storage
+	std::string wt_path;
+#endif
 
 	// Interpolated wavetables
 	/** Upsampling factor. No upsampling if 0. */
@@ -55,6 +61,7 @@ struct Wavetable {
 
 	void reset() {
 		filename = "Basic.wav";
+		wt_path = "";
 		waveLen = 1024;
 		loading.store(true, std::memory_order_seq_cst);
 		DEFER({loading.store(false, std::memory_order_release);});
@@ -176,6 +183,11 @@ struct Wavetable {
 		json_object_set_new(rootJ, "waveLen", json_integer(waveLen));
 		// filename
 		json_object_set_new(rootJ, "filename", json_string(filename.c_str()));
+
+#ifdef METAMODULE
+		json_object_set_new(rootJ, "wt_path", json_string(wt_path.c_str()));
+#endif
+
 		return rootJ;
 	}
 
@@ -188,6 +200,13 @@ struct Wavetable {
 		json_t* filenameJ = json_object_get(rootJ, "filename");
 		if (filenameJ)
 			filename = json_string_value(filenameJ);
+
+#ifdef METAMODULE
+		// Saving on the MetaModule saves the full path, so subdirs can be used
+		if (json_t* wt_pathJ = json_object_get(rootJ, "wt_path")) {
+			wt_path = json_string_value(wt_pathJ);
+		}
+#endif
 	}
 
 	void load(std::string path) {
@@ -284,6 +303,7 @@ struct Wavetable {
 		load(path);
 		filename = system::getFilename(path);
 #if defined(METAMODULE)
+		wt_path = path;
 		MetaModule::Patch::mark_patch_modified();
 		});
 #endif

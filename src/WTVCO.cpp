@@ -1,5 +1,8 @@
 #include "plugin.hpp"
 #include "Wavetable.hpp"
+#include "filesystem/helpers.hh"
+#include "patch/patch_file.hh"
+
 
 
 using simd::float_4;
@@ -84,16 +87,30 @@ struct WTVCO : Module {
 	}
 
 	void onAdd(const AddEvent& e) override {
+#ifdef METAMODULE
+		std::string path;
+		if (wavetable.wt_path.empty())
+			path = MetaModule::Filesystem::translate_path_to_local(wavetable.filename, MetaModule::Patch::get_dir());
+		else
+			path = wavetable.wt_path;
+
+#else
 		std::string path = system::join(getPatchStorageDirectory(), "wavetable.wav");
+#endif
 		// Silently fails
 		wavetable.load(path);
 	}
 
 	void onSave(const SaveEvent& e) override {
+#ifndef METAMODULE
+		// Rack saves a copy of the wavetable in patch storage as wavetable.wav
+		// MetaModule does not do this
+
 		if (!wavetable.samples.empty()) {
 			std::string path = system::join(createPatchStorageDirectory(), "wavetable.wav");
 			wavetable.save(path);
 		}
+#endif
 	}
 
 	void clearOutput() {
