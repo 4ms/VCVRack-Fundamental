@@ -5,6 +5,8 @@
 #if defined(METAMODULE)
 #include "filesystem/async_filebrowser.hh"
 #include "patch/patch_file.hh"
+#include "gui/notification.hh"
+#include "system/memory.hh"
 #include <chrono>
 #else
 #include <thread>
@@ -225,18 +227,38 @@ struct Wavetable {
 		if (ext == ".wav") {
 			// Load WAV
 			drwav wav;
+
 #if defined ARCH_WIN
 			if (!drwav_init_file_w(&wav, string::UTF8toUTF16(path).c_str(), NULL))
+				return;
+#elif defined METAMODULE
+			if (!drwav_init_file(&wav, path.c_str(), NULL)) {
+				std::string err = "WTVCO: cannot open wavetable '" + path + "'";
+				MetaModule::Gui::notify_user(err, 1500);
+				return;
+			}
 #else
 			if (!drwav_init_file(&wav, path.c_str(), NULL))
-#endif
 				return;
+#endif
 
 			size_t len = wav.totalPCMFrameCount * wav.channels;
-			if (len == 0 || len >= (1 << 20))
+			if (len == 0 || len >= (1 << 20)) {
+#ifdef METAMODULE
+				std::string err = "WTVCO: file " + path + " is too large (max 1M samples)";
+				MetaModule::Gui::notify_user(err, 1500);
+#endif
 				return;
+			}
 
 			samples.clear();
+#ifdef METAMODULE
+			if (MetaModule::System::free_memory() < (len * sizeof(float))) {
+				std::string err = "WTVCO: not enough free memory to open file " + path;
+				MetaModule::Gui::notify_user(err, 1500);
+				return;
+			}
+#endif
 			samples.resize(len);
 
 			// If sample rate is a power of 2, set waveLen to it.
