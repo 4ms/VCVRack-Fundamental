@@ -315,11 +315,7 @@ struct Wavetable {
 		osdialog_filters* filters = osdialog_filters_parse(WAVETABLE_FILTERS);
 		DEFER({osdialog_filters_free(filters);});
 
-#if defined(METAMODULE)
-		async_osdialog_file(OSDIALOG_SAVE, wavetableDir.empty() ? NULL : wavetableDir.c_str(), filename.c_str(), filters, [this](char *pathC) {
-#else
 		char* pathC = osdialog_file(OSDIALOG_SAVE, wavetableDir.empty() ? NULL : wavetableDir.c_str(), filename.c_str(), filters);
-#endif
 		if (!pathC) {
 			// Cancel silently
 			return;
@@ -334,9 +330,6 @@ struct Wavetable {
 		wavetableDir = system::getDirectory(path);
 
 		save(path);
-#if defined(METAMODULE)
-		});
-#endif
 	}
 
 	void appendContextMenu(Menu* menu) {
@@ -348,9 +341,11 @@ struct Wavetable {
 			[=]() {loadDialog();}
 		));
 
+#if !defined(METAMODULE)
 		menu->addChild(createMenuItem("Save wavetable", "",
 			[=]() {saveDialog();}
 		));
+#endif
 
 		int sizeOffset = 4;
 		std::vector<std::string> sizeLabels;
