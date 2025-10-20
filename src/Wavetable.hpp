@@ -284,6 +284,7 @@ struct Wavetable {
 		load(path);
 		filename = system::getFilename(path);
 #if defined(METAMODULE)
+		MetaModule::Patch::mark_patch_modified();
 		});
 #endif
 	}
