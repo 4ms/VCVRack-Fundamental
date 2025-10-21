@@ -31,6 +31,9 @@ struct Wavetable {
 #if defined(METAMODULE)
 	// Path to wavetable, used by MM since it doesn't save a copy in patch storage
 	std::string wt_path;
+
+	size_t requested_quality = 0;
+	static constexpr size_t max_samples = 20'000'000; //80MB max
 #endif
 
 	// Interpolated wavetables
@@ -41,10 +44,7 @@ struct Wavetable {
 	/** Waves bandlimited at each octave
 	(octave, waveCount, waveLen * quality)
 	*/
-#ifdef METAMODULE
-	size_t requested_quality = 0;
-	static constexpr size_t max_samples = 20'000'000; //80MB max
-#endif
+
 	std::vector<float> interpolatedSamples;
 
 	std::atomic<bool> loading{false};
@@ -63,18 +63,17 @@ struct Wavetable {
 
 	void reset() {
 		filename = "Basic.wav";
-		wt_path = "";
 		waveLen = 1024;
+#if defined(METAMODULE)
+		wt_path = "";
+#endif
+
 		loading.store(true, std::memory_order_seq_cst);
 		DEFER({loading.store(false, std::memory_order_release);});
+
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
-#if defined(METAMODULE)
-		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
-		while (std::chrono::steady_clock::now().time_since_epoch().count() - now < 100'000)
-			;
-#else
-		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
-#endif
+		wait_us(100);
+
 		samples.resize(waveLen * 4);
 
 		// Sine
@@ -140,7 +139,7 @@ struct Wavetable {
 		octaves = math::log2(waveLen) - 1;
 		interpolatedSamples.clear();
 
-#ifdef METAMODULE
+#if defined METAMODULE
 		size_t max_quality = max_samples / (octaves * samples.size());
 		quality = std::min(requested_quality, max_quality);
 		if (quality == 0)
@@ -214,14 +213,9 @@ struct Wavetable {
 	void load(std::string path) {
 		loading.store(true, std::memory_order_seq_cst);
 		DEFER({loading.store(false, std::memory_order_release);});
+
 		// HACK Sleep 100us so DSP thread is likely to finish processing before we resize the vector
-#if defined(METAMODULE)
-		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
-		while (std::chrono::steady_clock::now().time_since_epoch().count() - now < 100'000)
-			;
-#else
-		std::this_thread::sleep_for(std::chrono::duration<double>(100e-6));
-#endif
+		wait_us(100);
 
 		std::string ext = string::lowercase(system::getExtension(path));
 		if (ext == ".wav") {
@@ -399,6 +393,16 @@ struct Wavetable {
 			[=]() {return math::log2(waveLen) - sizeOffset;},
 			[=](int i) {waveLen = 1 << (i + sizeOffset);}
 		));
+	}
+
+	static void wait_us(unsigned us) {
+#if defined(METAMODULE)
+		auto now = std::chrono::steady_clock::now().time_since_epoch().count();
+		while (std::chrono::steady_clock::now().time_since_epoch().count() - now < (us * 100))
+			;
+#else
+		std::this_thread::sleep_for(std::chrono::duration<double>((double)us * 1e-6));
+#endif
 	}
 };
 
