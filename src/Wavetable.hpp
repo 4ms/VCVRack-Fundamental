@@ -227,8 +227,10 @@ struct Wavetable {
 				return;
 #elif defined METAMODULE
 			if (!drwav_init_file(&wav, path.c_str(), NULL)) {
-				std::string err = "WTVCO: cannot open wavetable '" + path + "'";
-				MetaModule::Gui::notify_user(err, 1500);
+				if (!path.ends_with("Basic.wav")) {
+					std::string err = "Cannot open wavetable '" + path + "'";
+					MetaModule::Gui::notify_user(err, 1500);
+				}
 				return;
 			}
 #else
@@ -239,7 +241,7 @@ struct Wavetable {
 			size_t len = wav.totalPCMFrameCount * wav.channels;
 			if (len == 0 || len >= (1 << 20)) {
 #ifdef METAMODULE
-				std::string err = "WTVCO: file " + path + " is too large (max 1M samples)";
+				std::string err = "Wavetable file '" + path + "' is too large (max 1M samples)";
 				MetaModule::Gui::notify_user(err, 1500);
 #endif
 				return;
@@ -248,7 +250,7 @@ struct Wavetable {
 			samples.clear();
 #ifdef METAMODULE
 			if (MetaModule::System::free_memory() < (len * sizeof(float))) {
-				std::string err = "WTVCO: not enough free memory to open file " + path;
+				std::string err = "Not enough free memory to open wavetable '" + path+ "'";
 				MetaModule::Gui::notify_user(err, 1500);
 				return;
 			}
