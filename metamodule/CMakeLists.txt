@@ -65,11 +65,10 @@ target_sources(Fundamental
     # This is a replacement:
     quant.cc
 
-    # Not relevent without polyphony:
-	# ${SOURCE_DIR}/Merge.cpp
-	# ${SOURCE_DIR}/Split.cpp 
-	# ${SOURCE_DIR}/Sum.cpp
-	# ${SOURCE_DIR}/Viz.cpp
+	${SOURCE_DIR}/Merge.cpp
+	${SOURCE_DIR}/Split.cpp 
+	${SOURCE_DIR}/Sum.cpp
+	${SOURCE_DIR}/Viz.cpp
 
 	plugin-mm.cpp
 )

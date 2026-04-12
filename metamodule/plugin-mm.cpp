@@ -51,6 +51,11 @@ void MM_INIT(Plugin *p) {
 	p->addModel(modelPush);
 	p->addModel(modelSHASR);
 
+	p->addModel(modelMerge);
+	p->addModel(modelSplit);
+	p->addModel(modelSum);
+	p->addModel(modelViz);
+
 	using namespace MetaModule;
 
 	register_module<RackClone::Quant, RackClone::QuantInfo>("Fundamental");

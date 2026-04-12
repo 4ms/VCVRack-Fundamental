@@ -105,7 +105,7 @@ struct SumChannelDisplay : ChannelDisplay {
 		int channels = 16;
 		if (module)
 			channels = module->lastChannels;
-		text = string::f("%d", channels);
+		text = std::to_string(channels);//string::f("%d", channels);
 	}
 };
 
@@ -126,10 +126,12 @@ struct SumWidget : ModuleWidget {
 
 		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(7.62, 113.066)), module, Sum::MONO_OUTPUT));
 
+#ifndef METAMODULE
 		SumDisplay* display = createWidget<SumDisplay>(mm2px(Vec(0.0, 13.039)));
 		display->box.size = mm2px(Vec(15.241, 36.981));
 		display->module = module;
 		addChild(display);
+#endif
 
 		addChild(createLightCentered<SmallSimpleLight<RedLight>>(mm2px(Vec(10.808, 18.081)), module, Sum::VU_LIGHTS + 0));
 		addChild(createLightCentered<SmallSimpleLight<YellowLight>>(mm2px(Vec(10.808, 23.378)), module, Sum::VU_LIGHTS + 1));

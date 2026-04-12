@@ -80,8 +80,16 @@ struct SplitWidget : ModuleWidget {
 		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(18.119, 102.955)), module, Split::MONO_OUTPUTS + 14));
 		addOutput(createOutputCentered<ThemedPJ301MPort>(mm2px(Vec(18.119, 113.115)), module, Split::MONO_OUTPUTS + 15));
 
+#ifdef METAMODULE
+		SplitChannelDisplay* display = createWidget<SplitChannelDisplay>(mm2px(Vec(14.02, 18.611)));
+		display->box.size = mm2px(Vec(16, 10));
+		display->textPos = Vec(22, 20);
+		display->bgText = "";
+		display->fontSize = 18;
+#else
 		SplitChannelDisplay* display = createWidget<SplitChannelDisplay>(mm2px(Vec(14.02, 18.611)));
 		display->box.size = mm2px(Vec(8.197, 8.197));
+#endif
 		display->module = module;
 		addChild(display);
 	}
