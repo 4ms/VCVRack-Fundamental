@@ -154,6 +154,22 @@
 	{
 		"slug": "Scope",
 		"name": "Scope"
-	}
+	},
+    {
+      "slug": "Split",
+      "name": "Split"
+    },
+    {
+      "slug": "Merge",
+      "name": "Merge"
+    },
+    {
+      "slug": "Sum",
+      "name": "Sum"
+    },
+    {
+      "slug": "Viz",
+      "name": "Viz"
+    }
 	]
 }
