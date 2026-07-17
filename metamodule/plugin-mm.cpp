@@ -3,17 +3,9 @@
 #include "quant.hh"
 #include "quant_info.hh"
 
-#if defined(METAMODULE_BUILTIN)
-#define MM_EXTERN extern
-#define MM_INIT init_Fundamental
-#else
-#define MM_EXTERN
-#define MM_INIT init
-#endif
+Plugin *pluginInstance;
 
-MM_EXTERN Plugin *pluginInstance;
-
-void MM_INIT(Plugin *p) {
+void init(Plugin *p) {
 	pluginInstance = p;
 
 	p->addModel(modelVCO);
